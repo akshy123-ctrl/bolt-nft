@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-contracts:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Rust
+      uses: actions-rust-lang/setup-rust-toolchain@v1
+      with:
+        toolchain: stable
+        target: wasm32-unknown-unknown
+
+    - name: Build contracts
+      run: |
+        cargo build -p royalty-splitter --target wasm32-unknown-unknown --release
+        cargo build --target wasm32-unknown-unknown --release
+
+    - name: Debug - List files
+      run: ls -R target/wasm32-unknown-unknown/release/
+
+    - name: Run contract tests
+      run: cargo test
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    needs: test-contracts
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Lint
+      run: npm run lint
+
+    - name: Build
+      run: npm run build
+      env:
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        NEXT_PUBLIC_NETWORK: testnet

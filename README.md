@@ -3,11 +3,11 @@
 A production-ready NFT marketplace built on the Stellar network using Soroban smart contracts. This project demonstrates advanced contract patterns, including atomic inter-contract calls for automated royalty distribution and real-time sales tracking.
 
 ## 🚀 Live Demo
-- **Live Application**: [https://nftmarket-iota.vercel.app/](https://nftmarket-iota.vercel.app/)
-- **Deployment Status**: [Vercel Deployment](https://nftmarket-iota.vercel.app/)
+- **Live Application**: [https://bolt-nft.vercel.app/](https://bolt-nft.vercel.app/)
+- **Deployment Status**: [Vercel Deployment](https://bolt-nft.vercel.app/)
 
 ## 📊 CI/CD Status
-![CI Status](https://github.com/akshy123-ctrl/nftmarket/actions/workflows/ci.yml/badge.svg)
+![CI Status](https://github.com/akshy123-ctrl/bolt-nft/actions/workflows/ci.yml/badge.svg)
 
 ## 📱 Visual Preview
 
@@ -58,39 +58,56 @@ The core protocol is backed by a comprehensive suite of automated tests covering
 ### 🧪 Detailed Testing Guide
 To verify the smart contract logic locally, follow these steps:
 
-#### 1. Install Prerequisites
-Ensure you have the [Stellar CLI](https://developers.stellar.org/docs/build/smart-contracts/getting-started/setup#install-the-stellar-cli) installed:
+#### 1. Build the Contracts
+Before testing, ensure all contracts are built to satisfy inter-contract dependencies:
 ```bash
-cargo install --locked stellar-cli --features opt
-```
-
-#### 2. Build the Contracts
-The Marketplace contract requires the other contracts to be built first to import their interfaces:
-```bash
-# Build all contracts in the workspace
+# From the project root
 cargo build --target wasm32-unknown-unknown --release
 ```
 
-#### 3. Run the Test Suite
-Execute the integration tests which simulate a full marketplace environment:
+#### 2. Run Individual Contract Tests
+Navigate into each contract directory to run its specific unit tests:
+
+**Marketplace Testing:**
+```bash
+cd contracts/marketplace
+cargo test
+```
+
+**Royalty Splitter Testing:**
+```bash
+cd contracts/royalty_splitter
+cargo test
+```
+
+**NFT Asset Testing:**
+```bash
+cd contracts/start_nft
+cargo test
+```
+
+#### 3. Workspace-Wide Testing
+You can also run all tests from the project root:
 ```bash
 cargo test
 ```
 
-#### 4. Understanding the Tests
-- **Integration Tests (`contracts/marketplace/src/test.rs`)**: These tests use a mocked environment to simulate multiple accounts (Seller, Buyer, Creator). It verifies that when a `buy_nft` call is made, the `RoyaltySplitter` contract is invoked atomically, funds are distributed, and ownership is transferred correctly.
+#### 4. Understanding the Test Logic
+- **`marketplace/src/test.rs`**: Simulates the full NFT lifecycle (Mint -> List -> Buy -> Settle). It verifies that when a purchase occurs, the Marketplace atomically calls the Splitter contract, which then distributes XLM to both the Seller and the Creator correctly.
 
 ## 📜 Deployed Contracts (Testnet)
 | Contract | Address |
 | :--- | :--- |
-| **Marketplace** | `CCIGXUYLGJWZK3RZ7SMQD6RXGECU2X56AQTDUCXQH7S5PXKXCYEUWWWL` |
+| **Marketplace** | `CD5BIENAZHWBQMEQQEO7EUSXHWF6K6KDJI4DWHJGKLH6YZEPTV73K2IK` |
 | **Royalty Splitter** | `CBGS3HWQ7JOH3MMLXY64ACEQHIY6XLD35EURXMTLILNCDURJBMAFV5ZA` |
-| **STARTNFT Asset** | `CDP7NE5WFWA6U3Q6LFMZPQR2GVR5LTSELQGFBMBUDHVZPJRHUZSA7VCI` |
+| **STARTNFT Asset** | `CAUXXO22QIYDURZXHAHC3S7JQF654B35ZYMTLG64ASJUBACC4KH5CLOF` |
+| **Native Token (XLM)** | `CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC` |
 
-## 🔗 Transaction Hashes
+## 🔗 Transaction Hashes & Identity
 - **Marketplace Deployment**: `fb501ed7cb89a6e3c0e2f0e6e2a81c062b57c27da7fd61aad6dd90535688e08f`
 - **Splitter Deployment**: `c29c6f64990929076721e172d5e0d5e76630c2dcb0ec0697658df50c227122bf`
 - **STARTNFT Deployment**: `196255819e6ab6e8d1e00ba64b56eaefcebfa9f576c4216479de92f978f5c9aa`
+- **Admin/Issuer Wallet**: `GBKNHIATMCYTFZZZUX347NF2SCH7MKMT7HS73HOVCC55CDJEI53I6S5A`
 
 ## 💻 Local Development
 
@@ -115,7 +132,7 @@ cargo test
 ## ✅ Submission Checklist
 - [x] Public GitHub repository
 - [x] README with complete documentation
-- [x] 8+ meaningful commits (Current: 14)
+- [x] 8+ meaningful commits (Current: 8)
 - [x] Live demo link
 - [x] Product demo video
 - [x] Mobile responsive screenshot
